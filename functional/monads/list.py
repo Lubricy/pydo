@@ -1,19 +1,18 @@
 from abc import abstractmethod
 from typing import Callable
-from ..functor import Monad, A, B
-# from functor import Functor
+from ..functor import Monad
 
-class List(Monad[A]):
+class List[A](Monad[A]):
     @classmethod
-    def pure(cls, value: B) -> 'List[B]':
+    def pure(cls, value: A) -> 'List[A]':
         return Cons(value, Nil())
 
     @abstractmethod
-    def map(self, f: Callable[[A], B]) -> 'List[B]':
+    def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':
         ...
 
     @abstractmethod
-    def bind(self, f: 'Callable[[A], List[B]]') -> 'List[B]':
+    def bind[B](self, f: 'Callable[[A], List[B]]') -> 'List[B]':
         ...
 
     @abstractmethod
@@ -27,15 +26,18 @@ class List(Monad[A]):
     def __repr__(self) -> str:
         return f'List<{self.to_list()}>'
 
+    @abstractmethod
+    def __hash__(self) -> int:
+        ...
 
     @classmethod
-    def from_list(cls, l: list[B]) -> 'List[B]':
+    def from_list[B](cls, l: list[B]) -> 'List[B]':
         if l:
             return Cons(l[0], List.from_list(l[1:]))
         else:
             return Nil()
 
-class Cons(List[A]):
+class Cons[A](List[A]):
     def __init__(self, head: A, tail: List[A]):
         self.head = head
         self.tail = tail
@@ -43,25 +45,32 @@ class Cons(List[A]):
     def to_list(self) -> list[A]:
         return [self.head, *self.tail.to_list()]
 
-    def map(self, f: Callable[[A], B]) -> 'List[B]':
-        return Cons(f(self.head), self.tail.map(f))
+    def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':
+        return Cons(f(self.head), self.tail.fmap(f))
 
     def concat(self, other: 'List[A]') -> 'List[A]':
         return Cons(self.head, self.tail.concat(other))
 
-    def bind(self, f: 'Callable[[A], List[B]]') -> 'List[B]':
+    def bind[B](self, f: 'Callable[[A], List[B]]') -> 'List[B]':
         return f(self.head).concat(self.tail.bind(f))
 
+    def __hash__(self) -> int:
+        return hash((self.head, self.tail))
 
-class Nil(List[A]):
+
+class Nil[A](List[A]):
     def to_list(self) -> list[A]:
         return []
 
-    def map(self, f: Callable[[A], B]) -> 'List[B]':
+    def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':
         return Nil()
 
     def concat(self, other: 'List[A]') -> 'List[A]':
         return other
 
-    def bind(self, f: 'Callable[[A], List[B]]') -> 'List[B]':
+    def bind[B](self, f: 'Callable[[A], List[B]]') -> 'List[B]':
         return Nil()
+
+    def __hash__(self) -> int:
+        return hash(None)
+

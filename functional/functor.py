@@ -1,27 +1,23 @@
 from abc import abstractmethod
-from typing import Protocol, TypeVar, Callable
+from typing import Protocol, Callable, Self
 
-A = TypeVar("A", covariant=True)
-B = TypeVar("B")
-
-class Functor(Protocol[A]):
-    def map(self, f: Callable[[A], B]) -> 'Functor[B]':
+class Functor[A](Protocol):
+    def fmap[B](self, f: Callable[[A], B]) -> 'Functor[B]':
         ...
+    def __eq__(self, value: object, /) -> bool:
+        return hash(self) == hash(value)
 
-class Applicative(Functor[A]):
+class Applicative[A](Functor[A], Protocol):
     @classmethod
     @abstractmethod
-    def pure(cls, value: B) -> 'Monad[B]':
+    def pure(cls, value: A) -> 'Applicative[A]':
         ...
 
     # @abstractmethod
-    # @classmethod
-    # def ap(cls, value: A) -> 'Monad[A]':
+    # def ap(self, fa: 'Applicative[A]') -> Self:
     #     ...
 
-M = TypeVar("M", bound="Monad")
-class Monad(Applicative[A]):
+class Monad[A](Applicative[A], Protocol):
     @abstractmethod
-    def bind(self, f: 'Callable[[A], M]') -> M:
+    def bind(self, f: Callable[[A], Self]) -> Self:
         ...
-
