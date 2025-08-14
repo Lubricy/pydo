@@ -1,8 +1,7 @@
-from typing import Callable, TypeVar
+from typing import Callable, Literal
 from ..functor import Monad
 
-class Identity[A](Monad[A]):
-    B = TypeVar("B", infer_variance=True)
+class Identity[A](Monad[Literal["Identity"], A]):
     def __init__(self, value: A):
         self.value = value
 
@@ -15,7 +14,7 @@ class Identity[A](Monad[A]):
     def fmap[B](self, f: Callable[[A], B]) -> 'Identity[B]':
         return Identity(f(self.value))
 
-    def bind(self, f: Callable[[A], "Identity[B]"]) -> 'Identity[B]':
+    def bind[B](self, f: Callable[[A], "Identity[B]"]) -> 'Identity[B]':
         return f(self.value)
 
     def to_value(self) -> A:

@@ -1,34 +1,23 @@
 from abc import abstractmethod
-from typing import Protocol, Callable, Self
+from typing import Protocol, Callable, Self, Unpack
 
-class Functor[A](Protocol):
-    def fmap[B](self, f: Callable[[A], B]) -> 'Functor[B]':
+class Functor[*M, A](Protocol):
+    def fmap[B](self, f: Callable[[A], B]) -> 'Functor[Unpack[M], B]':
         ...
     def __eq__(self, value: object, /) -> bool:
         return hash(self) == hash(value)
 
-class Applicative[A](Functor[A], Protocol):
+class Applicative[*M, A](Functor[Unpack[M], A], Protocol):
     @classmethod
     @abstractmethod
-    def pure[B](cls, value: B) -> 'Applicative[B]':
-        ...
-
-    def fmap[B](self, f: Callable[[A], B]) -> 'Applicative[B]':
+    def pure[B](cls, value: B) -> 'Applicative[Unpack[M], B]':
         ...
 
     # @abstractmethod
     # def ap(self, fa: 'Applicative[A]') -> Self:
     #     ...
 
-class Monad[A](Applicative[A], Protocol):
-    @classmethod
+class Monad[*M, A](Applicative[Unpack[M], A], Protocol):
     @abstractmethod
-    def pure[B](cls, value: B) -> 'Monad[B]':
-        ...
-
-    def fmap[B](self, f: Callable[[A], B]) -> 'Monad[B]':
-        ...
-
-    @abstractmethod
-    def bind(self, f: Callable[[A], Self]) -> Self:
+    def bind(self, f: Callable[[A], Self]) -> Self: # HACK: Self := Monad[M, B]
         ...

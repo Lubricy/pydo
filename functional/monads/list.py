@@ -1,8 +1,8 @@
 from abc import abstractmethod
-from typing import Callable
+from typing import Callable, Literal
 from ..functor import Monad
 
-class List[A](Monad[A]):
+class List[A](Monad[Literal["List"], A]):
 
     @abstractmethod
     def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':

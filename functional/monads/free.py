@@ -1,10 +1,10 @@
 from abc import abstractmethod
-from typing import Callable
+from typing import Callable, Literal
 
 from functional.monads.identity import Identity
 from ..functor import Functor, Monad
 
-class Free[F: Functor, A](Monad[A]):
+class Free[F: Functor, A](Monad[Literal["Free"], F, A]):
     @classmethod
     def pure[B](cls, value: B) -> 'Free[F, B]':
         return Finish(value)
@@ -34,7 +34,7 @@ class Finish[F: Functor, A](Free[F, A]):
         return hash(("Finish", self.value))
 
 class Suspend[F: Functor, A](Free[F, A]):
-    def __init__(self, functor: Functor[Free[F, A]]):
+    def __init__(self, functor: Functor[F, Free[F, A]]):
         self.functor = functor
 
     def __repr__(self) -> str:

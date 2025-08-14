@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from typing import Callable
+from typing import Callable, Literal
 from ..functor import Monad
 # from functor import Functor
 
-class Maybe[A](Monad[A]):
+class Maybe[A](Monad[Literal["Maybe"], A]):
     @classmethod
     def pure[B](cls, value: B) -> 'Maybe[B]':
         return Just(value)
