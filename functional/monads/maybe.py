@@ -5,7 +5,7 @@ from ..functor import Monad
 
 class Maybe[A](Monad[A]):
     @classmethod
-    def pure(cls, value: A) -> 'Maybe[A]':
+    def pure[B](cls, value: B) -> 'Maybe[B]':
         return Just(value)
 
     @abstractmethod

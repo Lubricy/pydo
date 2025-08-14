@@ -10,7 +10,10 @@ class Functor[A](Protocol):
 class Applicative[A](Functor[A], Protocol):
     @classmethod
     @abstractmethod
-    def pure(cls, value: A) -> 'Applicative[A]':
+    def pure[B](cls, value: B) -> 'Applicative[B]':
+        ...
+
+    def fmap[B](self, f: Callable[[A], B]) -> 'Applicative[B]':
         ...
 
     # @abstractmethod
@@ -18,6 +21,14 @@ class Applicative[A](Functor[A], Protocol):
     #     ...
 
 class Monad[A](Applicative[A], Protocol):
+    @classmethod
+    @abstractmethod
+    def pure[B](cls, value: B) -> 'Monad[B]':
+        ...
+
+    def fmap[B](self, f: Callable[[A], B]) -> 'Monad[B]':
+        ...
+
     @abstractmethod
     def bind(self, f: Callable[[A], Self]) -> Self:
         ...

@@ -3,9 +3,6 @@ from typing import Callable
 from ..functor import Monad
 
 class List[A](Monad[A]):
-    @classmethod
-    def pure(cls, value: A) -> 'List[A]':
-        return Cons(value, Nil())
 
     @abstractmethod
     def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':
@@ -29,6 +26,10 @@ class List[A](Monad[A]):
     @abstractmethod
     def __hash__(self) -> int:
         ...
+
+    @classmethod
+    def pure[B](cls, value: B) -> 'List[B]':
+        return Cons(value, Nil())
 
     @classmethod
     def from_list[B](cls, l: list[B]) -> 'List[B]':

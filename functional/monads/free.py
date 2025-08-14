@@ -6,7 +6,7 @@ from ..functor import Functor, Monad
 
 class Free[F: Functor, A](Monad[A]):
     @classmethod
-    def pure(cls, value: A) -> 'Free[F, A]':
+    def pure[B](cls, value: B) -> 'Free[F, B]':
         return Finish(value)
 
     @abstractmethod

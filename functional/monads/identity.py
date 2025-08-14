@@ -7,8 +7,10 @@ class Identity[A](Monad[A]):
         self.value = value
 
     @classmethod
-    def pure(cls, value: A) -> 'Identity[A]':
+    def pure[B](cls, value: B) -> 'Identity[B]':
         return Identity(value)
+
+    from_value = pure
 
     def fmap[B](self, f: Callable[[A], B]) -> 'Identity[B]':
         return Identity(f(self.value))
@@ -22,6 +24,3 @@ class Identity[A](Monad[A]):
     def __repr__(self) -> str:
         return f'Identity<{self.to_value()}>'
 
-    @classmethod
-    def from_value(cls, value: A) -> 'Identity[A]':
-        return cls.pure(value)
