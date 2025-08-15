@@ -13,7 +13,7 @@ def test_fmap_id(m):
 @given(
     monad_strategy,
     st.functions(
-        like=lambda x: ...,
+        like=lambda _: ...,
         returns=monad_strategy,
         pure=True))
 def test_monad_left_id(v, f):
@@ -25,7 +25,7 @@ def test_monad_right_id(m):
 
 @given(monad_strategy,
        st.functions(
-        like=lambda x: ...,
+        like=lambda _: ...,
         returns=monad_strategy,
         pure=True))
 def test_monad_right_id2(m, f):

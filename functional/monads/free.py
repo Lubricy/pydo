@@ -1,52 +1,53 @@
 from abc import abstractmethod
-from typing import Callable, Literal
+from typing import Callable, Literal, final
 
-from functional.monads.identity import Identity
 from ..functor import Functor, Monad
 
-class Free[F: Functor, A](Monad[Literal["Free"], F, A]):
+class Free[*Ts,  A](Monad[Literal["Free"], *Ts, A]):
     @classmethod
-    def pure[B](cls, value: B) -> 'Free[F, B]':
+    def pure[B](cls, value: B) -> 'Free[ *Ts, B]':
         return Finish(value)
 
     @abstractmethod
-    def fmap[B](self, f: Callable[[A], B]) -> 'Free[F, B]':
+    def fmap[B](self, f: Callable[[A], B]) -> 'Free[ *Ts, B]':
         ...
 
     @abstractmethod
-    def bind[B](self, f: 'Callable[[A], Free[F, B]]') -> 'Free[F, B]':
+    def bind[B](self, f: 'Callable[[A], Free[*Ts, B]]') -> 'Free[ *Ts, B]':
         ...
 
-class Finish[F: Functor, A](Free[F, A]):
+@final
+class Finish[*Ts, A](Free[ *Ts, A]):
     def __init__(self, value: A):
         self.value = value
 
     def __repr__(self) -> str:
         return f"Finish({self.value})"
 
-    def fmap[B](self, f: Callable[[A], B]) -> 'Free[F, B]':
+    def fmap[B](self, f: Callable[[A], B]) -> 'Free[ *Ts, B]':
         return Finish(f(self.value))
 
-    def bind[B](self, f: 'Callable[[A], Free[F, B]]') -> 'Free[F, B]':
+    def bind[B](self, f: 'Callable[[A], Free[ *Ts, B]]') -> 'Free[ *Ts, B]':
         return f(self.value)
 
     def __hash__(self):
         return hash(("Finish", self.value))
 
-class Suspend[F: Functor, A](Free[F, A]):
-    def __init__(self, functor: Functor[F, Free[F, A]]):
+@final
+class Suspend[*Ts, A](Free[*Ts, A]):
+    def __init__(self, functor: Functor[*Ts, Free[*Ts, A]]):
         self.functor = functor
 
     def __repr__(self) -> str:
-        return f"Suspend({self.functor})"
+        return f"Suspend({repr(self.functor)})"
 
-    def fmap[B](self, f: Callable[[A], B]) -> 'Free[F, B]':
+    def fmap[B](self, f: Callable[[A], B]) -> Free[ *Ts, B]:
         # return self.bind(lambda x: Finish(f(x)))
-        def inner(x: Free[F, A]) -> Free[F, B]:
+        def inner(x: Free[ *Ts, A]) -> Free[ *Ts, B]:
             return x.fmap(f)
         return Suspend(self.functor.fmap(inner))
 
-    def bind[B](self, f: Callable[[A], Free[F, B]]) -> Free[F, B]:
+    def bind[B](self, f: Callable[[A], Free[*Ts, B]]) -> Free[ *Ts, B]:
         return Suspend(self.functor.fmap(lambda x: x.bind(f)))
 
     def __hash__(self):

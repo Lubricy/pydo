@@ -1,11 +1,11 @@
 from functools import wraps
-from typing import Any, Callable, Concatenate, Protocol, Unpack, cast
+from typing import Any, Callable, Concatenate, Protocol, cast
 
 from .functor import Monad
 from .monads.identity import Identity
 
 class Bind(Protocol):
-    def __call__[*T, A](self, __m: Monad[Unpack[T], A]) -> A:
+    def __call__[*Ts, A](self, __m: Monad[*Ts, A]) -> A:
         ...
 
 class NotBoundedYet[M: Monad](Exception):
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     lb = List.from_list([1,2,3])
 
     @do
-    def compute[M](m: type[Monad[M, Any]], bind: Bind, ma: Monad[M, str], mb: Monad[M, int]):
+    def compute[*M](m: type[Monad[*M, Any]], bind: Bind, ma: Monad[*M, str], mb: Monad[*M, int]):
         a = bind(ma)
         b = bind(mb)
         res = m.pure((a, b))

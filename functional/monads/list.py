@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Callable, Literal
+from typing import Callable, Literal, final
 from ..functor import Monad
 
 class List[A](Monad[Literal["List"], A]):
@@ -38,6 +38,7 @@ class List[A](Monad[Literal["List"], A]):
         else:
             return Nil()
 
+@final
 class Cons[A](List[A]):
     def __init__(self, head: A, tail: List[A]):
         self.head = head
@@ -59,17 +60,20 @@ class Cons[A](List[A]):
         return hash((self.head, self.tail))
 
 
+@final
 class Nil[A](List[A]):
     def to_list(self) -> list[A]:
         return []
 
     def fmap[B](self, f: Callable[[A], B]) -> 'List[B]':
+        del f
         return Nil()
 
     def concat(self, other: 'List[A]') -> 'List[A]':
         return other
 
     def bind[B](self, f: 'Callable[[A], List[B]]') -> 'List[B]':
+        del f
         return Nil()
 
     def __hash__(self) -> int:

@@ -1,6 +1,7 @@
-from typing import Callable, Literal
+from typing import Callable, Literal, final
 from ..functor import Monad
 
+@final
 class Identity[A](Monad[Literal["Identity"], A]):
     def __init__(self, value: A):
         self.value = value

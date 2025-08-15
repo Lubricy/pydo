@@ -1,10 +1,6 @@
-from typing import Callable, TypeVar
+from typing import Callable
+from functional.monads.fn import Fn
 
-A = TypeVar("A")
-B = TypeVar("B")
-C = TypeVar("C")
 
-def compose(f: Callable[[B], C], g: Callable[[A], B]) -> Callable[[A], C]:
-    def composed(x: A) -> C:
-        return f(g(x))
-    return composed
+def compose[A, B, C](f: Callable[[B], C], g: Callable[[A], B]) -> Fn[A, C]:
+    return Fn(g).fmap(f)
